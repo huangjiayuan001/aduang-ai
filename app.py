@@ -30,17 +30,18 @@ if uploaded_file is None:
 if uploaded_file is not None:
     rules_content = uploaded_file.read().decode("utf-8")
     
-      # 初始化记忆库
+        # 初始化记忆库
     if "messages" not in st.session_state:
         st.session_state.messages = [
-            {"role": "system", "content": f"你是一个外卖平台的规则客服。你必须【严格且只能】根据以下资料回答用户的问题。如果资料里没有提及用户问的内容，你必须直接回答'抱歉，资料中未提及该问题'。绝对不允许使用你自己原本的知识去脑补和回答。\n\n资料：\n{rules_content}"}
+            {"role": "system", "content": f"你是一个数据提取专家。请阅读以下资料，提取违规信息。必须严格输出 JSON，包含 'rule'（规则）, 'time'（涉及时间）, 'is_violation'（是否违规，填True或False）。\n\n例如：\n资料：超时5分钟以内不扣钱。\n输出：{{\"rule\": \"超时\", \"time\": \"5分钟\", \"is_violation\": False}}\n\n现在，请根据以下资料回答：\n{rules_content}"}
         ]
+        
     # 显示历史对话
     for msg in st.session_state.messages:
         if msg["role"] != "system":
             with st.chat_message(msg["role"]):
                 st.markdown(msg["content"])
-
+  
     # 提问输入框
     if prompt := st.chat_input("输入你想问文档里的问题："):
         with st.chat_message("user"):
