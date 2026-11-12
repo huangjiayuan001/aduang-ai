@@ -15,6 +15,18 @@ if st.sidebar.button("🧹 清空当前聊天记录"):
     st.session_state.messages = [] # 清空记忆
     st.rerun() # 刷新页面
 
+# 🚨 新增：定义一个自动清空的函数
+def clear_chat():
+    st.session_state.messages = []
+
+# 新增：角色选择器（带有 on_change 魔法）
+ai_role = st.sidebar.selectbox(
+    "请选择 AI 的角色：",
+    ["数据提取专家（吐 JSON）", "毒舌面试官（疯狂吐槽）", "短视频文案写手（爆款文案）"],
+    on_change=clear_chat
+)
+
+
 # 4. 网页上传文件按钮
 # 在主页面放一个清空按钮
 if st.button("🧹 清空聊天记录"):
@@ -29,11 +41,20 @@ if uploaded_file is None:
 # 6. 如果上传了文件，就开始工作！
 if uploaded_file is not None:
     rules_content = uploaded_file.read().decode("utf-8")
-    
-        # 初始化记忆库
+      # 初始化记忆库
     if "messages" not in st.session_state:
+        # 根据用户的选择，赋予 AI 不同的“灵魂”
+        if ai_role == "数据提取专家（吐 JSON）":
+            prompt_text = f"你是一个数据提取专家。请阅读以下资料，提取出关于外卖扣款的信息。你必须严格输出一个 JSON 格式的数据，不要包含任何其他解释文字。JSON 的键必须是 'rule_name' 和 'penalty_amount'。如果资料中没有提及，就输出 'null'。\n\n资料：\n{rules_content}"
+        
+        elif ai_role == "毒舌面试官（疯狂吐槽）":
+            prompt_text = f"你是一个极其严厉的互联网大厂技术总监。你正在面试一个零基础想转行 AI 开发的骑手。请根据以下他的项目资料，用非常毒舌、严厉的语气挑刺，指出他项目里的漏洞和不足，不要留情面。\n\n资料：\n{rules_content}"
+        
+        else:
+            prompt_text = f"你是一个千万粉丝的短视频爆款文案写手。请根据以下资料（比如骑手跑单的经历或规则），帮我写 3 条极具情绪价值、能引发共鸣的抖音文案，每条不超过 100 字。\n\n资料：\n{rules_content}"
+            
         st.session_state.messages = [
-            {"role": "system", "content": f"你是一个数据提取专家。请阅读以下资料，提取违规信息。必须严格输出 JSON，包含 'rule'（规则）, 'time'（涉及时间）, 'is_violation'（是否违规，填True或False）。\n\n例如：\n资料：超时5分钟以内不扣钱。\n输出：{{\"rule\": \"超时\", \"time\": \"5分钟\", \"is_violation\": False}}\n\n现在，请根据以下资料回答：\n{rules_content}"}
+            {"role": "system", "content": prompt_text}
         ]
         
     # 显示历史对话
