@@ -4,11 +4,12 @@ import pypdf # 新增：用来读取 PDF 的工具
 import io # 新增：用来处理文件数据流
 # 1. 网页基本设置（这俩必须放在最上面）
 st.set_page_config(page_title="阿黄的 AI 客服", page_icon="🛵")
-st.title("📂 骑手阿黄的智能文件问答助手")
+st.title("🏢 企业级智能文档解析助手")
+st.caption("上传 PDF/TXT 文件，让 AI 帮你快速总结合同、提炼报告、解析制度。")
 
 # 2. 连接 AI (填你自己的 Key)
 client = OpenAI(
-    api_key=st.secrets["DEEPSEEK_API_KEY"], 
+    api_key=st.secrets["DEEPSEEK_API_KEY"],
     base_url="https://api.deepseek.com"
 )
 
